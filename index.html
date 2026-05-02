@@ -71,15 +71,31 @@
             <span class="tag">📍 Methuen, MA</span>
         </div>
 
-        <!-- Second activity card -->
+        <!-- Card for Kidville Indoor Play with image from Azure Blob Storage -->
         <div class="card">
+
+            <!-- Image loaded directly from Azure Blob Storage container -->
+            <!-- src points to your playspotimages001 storage account -->
+            <!-- alt describes the image for accessibility and if image fails to load -->
+            <!-- style makes image fill the full card width with rounded corners -->
+            <img 
+                src="https://playspotimages001.blob.core.windows.net/playground-images/kidsville.jpg" 
+                alt="Kidville Indoor Play Burlington MA" 
+                style="width:100%; border-radius:6px; margin-bottom:10px;"
+            >
+
+            <!-- Activity name -->
             <h3>Kidville Indoor Play</h3>
+
+            <!-- Tags showing key details at a glance -->
             <span class="tag">🏠 Indoor</span>
             <span class="tag">Ages 1-7</span>
             <span class="tag">📍 Burlington, MA</span>
+
+        <!-- Closes this card -->
         </div>
 
-        <!-- Third activity card -->
+        <!-- activity card -->
         <div class="card">
             <h3>Discovery Museum</h3>
             <span class="tag">🏠 Indoor</span>
