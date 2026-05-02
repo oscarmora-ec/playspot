@@ -21,3 +21,6 @@ Oscar Mora - learning Azure cloud deployment through a real project.
 
 ## Status
 In progress - Day 1
+
+## Live Site
+https://blue-field-0abae4e0f.7.azurestaticapps.net/
