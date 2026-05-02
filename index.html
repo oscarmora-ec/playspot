@@ -45,24 +45,23 @@
         <!-- style="margin-bottom: 15px" adds space below this heading -->
         <h2 style="margin-bottom: 15px;">Activities Near You</h2>
 
-        <!-- Each div with class="card" is one activity box -->
-        <!-- class="card" connects it to the .card style in CSS -->
+        <!-- Card for Shawsheen River Park with image from Azure Blob Storage -->
         <div class="card">
-            <!-- h3 is the activity name inside the card -->
+
+            <!-- img tag displays an image on the page -->
+            <!-- src is where the image comes from - this is your Azure Blob Storage URL -->
+            <!-- alt is text that shows if image fails to load - good for accessibility -->
+            <!-- style makes the image fill the full card width and have rounded corners -->
+            <img 
+                src="https://playspotimages001.blob.core.windows.net/playground-images/shawsheen-park.jpg" 
+                alt="Shawsheen River Park playground" 
+                style="width:100%; border-radius:6px; margin-bottom:10px;"
+            >
+
             <h3>Shawsheen River Park</h3>
-
-            <!-- Each span is one tag badge -->
-            <!-- class="tag" connects it to the .tag style in CSS -->
-            <!-- The emoji adds a visual hint of what the tag means -->
             <span class="tag">🌳 Outdoor</span>
-
-            <!-- Age range tag -->
             <span class="tag">Ages 2-10</span>
-
-            <!-- Location tag -->
             <span class="tag">📍 Andover, MA</span>
-
-        <!-- Closes this activity card -->
         </div>
 
         <div class="card">
