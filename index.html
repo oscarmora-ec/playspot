@@ -1,113 +1,108 @@
-<!-- Tells the browser this is a modern HTML5 document -->
 <!DOCTYPE html>
-
-<!-- Opens the HTML document, en means English language -->
 <html lang="en">
-
-<!-- Head section holds settings - nothing here shows on the page -->
 <head>
-
-    <!-- Supports all characters including Spanish accents -->
     <meta charset="UTF-8">
-
-    <!-- Makes the page responsive on phones and tablets -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Text that appears on the browser tab -->
     <title>PlaySpot - Find Activities for Kids</title>
 
-    <!-- This connects our style.css file to this HTML page -->
-    <!-- Without this line none of our CSS styling would work -->
+    <!-- Links our CSS file for styling -->
     <link rel="stylesheet" href="style.css">
-
-<!-- Closes the head section -->
 </head>
-
-<!-- Body is everything the user sees on the page -->
 <body>
 
-    <!-- Header is the blue bar at the top of the page -->
+    <!-- Header section at the top of the page -->
     <header>
-        <!-- h1 is the biggest title - the emoji adds a fun touch -->
         <h1>🛝 PlaySpot</h1>
-
-        <!-- p is a paragraph - this is the subtitle under the title -->
         <p>Find fun activities for your kids nearby</p>
-
-    <!-- Closes the header -->
     </header>
 
-    <!-- This div is the main container for all activity cards -->
-    <!-- class="activities" connects it to the .activities style in CSS -->
+    <!-- Main activities section -->
     <div class="activities">
 
-        <!-- h2 is a section heading, slightly smaller than h1 -->
-        <!-- style="margin-bottom: 15px" adds space below this heading -->
         <h2 style="margin-bottom: 15px;">Activities Near You</h2>
 
-        <!-- Card for Shawsheen River Park with image from Azure Blob Storage -->
-        <div class="card">
+        <!-- This div will be populated by JavaScript -->
+        <!-- Instead of hardcoded cards we now load from API -->
+        <div id="activities-container">
 
-            <!-- img tag displays an image on the page -->
-            <!-- src is where the image comes from - this is your Azure Blob Storage URL -->
-            <!-- alt is text that shows if image fails to load - good for accessibility -->
-            <!-- style makes the image fill the full card width and have rounded corners -->
-            <img 
-                src="https://playspotimages001.blob.core.windows.net/playground-images/shawsheen-park.jpg" 
-                alt="Shawsheen River Park playground" 
-                style="width:100%; border-radius:6px; margin-bottom:10px;"
-            >
+            <!-- Loading message shown while API call is in progress -->
+            <p id="loading">Loading activities...</p>
 
-            <h3>Shawsheen River Park</h3>
-            <span class="tag">🌳 Outdoor</span>
-            <span class="tag">Ages 2-10</span>
-            <span class="tag">📍 Andover, MA</span>
         </div>
 
-        <div class="card">
-            <h3>Chucky N Cheese</h3>
-            <span class="tag">🏠 Indoor</span>
-            <span class="tag">Ages 3-10</span>
-            <span class="tag">📍 Methuen, MA</span>
-        </div>
-
-        <!-- Card for Kidville Indoor Play with image from Azure Blob Storage -->
-        <div class="card">
-
-            <!-- Image loaded directly from Azure Blob Storage container -->
-            <!-- src points to your playspotimages001 storage account -->
-            <!-- alt describes the image for accessibility and if image fails to load -->
-            <!-- style makes image fill the full card width with rounded corners -->
-            <img 
-                src="https://playspotimages001.blob.core.windows.net/playground-images/kidsville.jpg" 
-                alt="Kidville Indoor Play Burlington MA" 
-                style="width:100%; border-radius:6px; margin-bottom:10px;"
-            >
-
-            <!-- Activity name -->
-            <h3>Kidville Indoor Play</h3>
-
-            <!-- Tags showing key details at a glance -->
-            <span class="tag">🏠 Indoor</span>
-            <span class="tag">Ages 1-7</span>
-            <span class="tag">📍 Burlington, MA</span>
-
-        <!-- Closes this card -->
-        </div>
-
-        <!-- activity card -->
-        <div class="card">
-            <h3>Discovery Museum</h3>
-            <span class="tag">🏠 Indoor</span>
-            <span class="tag">Ages 2-10</span>
-            <span class="tag">📍 Acton, MA</span>
-        </div>
-
-    <!-- Closes the activities container -->
     </div>
 
-<!-- Closes the body -->
-</body>
+    <!-- JavaScript section -->
+    <!-- This runs after the page loads -->
+    <script>
 
-<!-- Closes the entire HTML document -->
+        // The URL of our Azure Function API
+        // This is the live URL we just deployed
+        const API_URL = 'https://playspot-api.azurewebsites.net/api/getactivities';
+
+        // This function builds an HTML card for each activity
+        // It takes one activity object and returns HTML string
+        function buildActivityCard(activity) {
+            return `
+                <div class="card">
+                    ${activity.image 
+                        ? `<img 
+                            src="${activity.image}" 
+                            alt="${activity.name}" 
+                            style="width:100%; border-radius:6px; margin-bottom:10px;"
+                          >`
+                        : ''
+                    }
+                    <h3>${activity.name}</h3>
+                    <span class="tag">${activity.type === 'Outdoor' ? '🌳' : '🏠'} ${activity.type}</span>
+                    <span class="tag">Ages ${activity.ageMin}-${activity.ageMax}</span>
+                    <span class="tag">📍 ${activity.city}, ${activity.state}</span>
+                </div>
+            `;
+        }
+
+        // This function loads activities from our API
+        // async means it runs without blocking the page
+        async function loadActivities() {
+
+            try {
+                // Call our Azure Function API
+                // fetch is a built in browser function for making HTTP requests
+                const response = await fetch(API_URL);
+
+                // Convert the response to a JavaScript array
+                const activities = await response.json();
+
+                // Get the container div where we will put the cards
+                const container = document.getElementById('activities-container');
+
+                // Remove the loading message
+                document.getElementById('loading').remove();
+
+                // Check if we got any activities back
+                if (activities.length === 0) {
+                    container.innerHTML = '<p>No activities found.</p>';
+                    return;
+                }
+
+                // Loop through each activity and build a card
+                // join combines all cards into one HTML string
+                container.innerHTML = activities
+                    .map(activity => buildActivityCard(activity))
+                    .join('');
+
+            } catch (error) {
+                // If something goes wrong show an error message
+                document.getElementById('loading').textContent = 
+                    'Error loading activities. Please try again later.';
+                console.error('Error:', error);
+            }
+        }
+
+        // Call loadActivities when the page loads
+        loadActivities();
+
+    </script>
+
+</body>
 </html>
