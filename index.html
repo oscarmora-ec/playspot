@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlaySpot - Find Activities for Kids</title>
-
     <!-- Links our CSS file for styling -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Header section at the top of the page -->
+    <!-- Header section -->
     <header>
         <h1>🛝 PlaySpot</h1>
         <p>Find fun activities for your kids nearby</p>
@@ -21,27 +20,66 @@
 
         <h2 style="margin-bottom: 15px;">Activities Near You</h2>
 
+        <!-- Filter buttons section -->
+        <!-- These buttons let parents filter activities -->
+        <div class="filters">
+
+            <!-- Type filters -->
+            <div class="filter-group">
+                <span class="filter-label">Type:</span>
+
+                <!-- data-filter tells JavaScript what to filter by -->
+                <!-- active class means this filter is currently selected -->
+                <button class="filter-btn active" data-filter="all" data-type="type">
+                    All
+                </button>
+                <button class="filter-btn" data-filter="Outdoor" data-type="type">
+                    🌳 Outdoor
+                </button>
+                <button class="filter-btn" data-filter="Indoor" data-type="type">
+                    🏠 Indoor
+                </button>
+            </div>
+
+            <!-- Age filters -->
+            <div class="filter-group">
+                <span class="filter-label">Age:</span>
+                <button class="filter-btn active" data-filter="all" data-type="age">
+                    All Ages
+                </button>
+                <button class="filter-btn" data-filter="toddler" data-type="age">
+                    Toddler (1-3)
+                </button>
+                <button class="filter-btn" data-filter="young" data-type="age">
+                    Young (4-6)
+                </button>
+                <button class="filter-btn" data-filter="older" data-type="age">
+                    Older (7-12)
+                </button>
+            </div>
+
+        </div>
+
         <!-- This div will be populated by JavaScript -->
-        <!-- Instead of hardcoded cards we now load from API -->
         <div id="activities-container">
-
-            <!-- Loading message shown while API call is in progress -->
             <p id="loading">Loading activities...</p>
-
         </div>
 
     </div>
 
-    <!-- JavaScript section -->
-    <!-- This runs after the page loads -->
     <script>
 
-        // The URL of our Azure Function API
-        // This is the live URL we just deployed
+        // Azure Function API URL
         const API_URL = 'https://playspot-api.azurewebsites.net/api/getactivities';
 
-        // This function builds an HTML card for each activity
-        // It takes one activity object and returns HTML string
+        // Store all activities globally so filters can access them
+        let allActivities = [];
+
+        // Track currently active filters
+        let activeTypeFilter = 'all';
+        let activeAgeFilter = 'all';
+
+        // Build HTML card for one activity
         function buildActivityCard(activity) {
             return `
                 <div class="card">
@@ -57,49 +95,122 @@
                     <span class="tag">${activity.type === 'Outdoor' ? '🌳' : '🏠'} ${activity.type}</span>
                     <span class="tag">Ages ${activity.ageMin}-${activity.ageMax}</span>
                     <span class="tag">📍 ${activity.city}, ${activity.state}</span>
+                    ${activity.admission 
+                        ? `<span class="tag">💰 ${activity.admission}</span>` 
+                        : ''
+                    }
                 </div>
             `;
         }
 
-        // This function loads activities from our API
-        // async means it runs without blocking the page
+        // Filter activities based on active filters
+        function filterActivities() {
+
+            // Start with all activities
+            let filtered = allActivities;
+
+            // Apply type filter if not set to all
+            if (activeTypeFilter !== 'all') {
+                filtered = filtered.filter(a => a.type === activeTypeFilter);
+            }
+
+            // Apply age filter if not set to all
+            if (activeAgeFilter !== 'all') {
+                filtered = filtered.filter(activity => {
+
+                    // Toddler: activity includes ages 1-3
+                    if (activeAgeFilter === 'toddler') {
+                        return activity.ageMin <= 3;
+                    }
+
+                    // Young: activity includes ages 4-6
+                    if (activeAgeFilter === 'young') {
+                        return activity.ageMin <= 6 && activity.ageMax >= 4;
+                    }
+
+                    // Older: activity includes ages 7-12
+                    if (activeAgeFilter === 'older') {
+                        return activity.ageMax >= 7;
+                    }
+
+                    return true;
+                });
+            }
+
+            // Get the container
+            const container = document.getElementById('activities-container');
+
+            // Show message if no activities match filters
+            if (filtered.length === 0) {
+                container.innerHTML = '<p>No activities found for this filter.</p>';
+                return;
+            }
+
+            // Build and display filtered cards
+            container.innerHTML = filtered
+                .map(activity => buildActivityCard(activity))
+                .join('');
+        }
+
+        // Handle filter button clicks
+        function setupFilters() {
+
+            // Get all filter buttons
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            // Add click event to each button
+            buttons.forEach(button => {
+
+                button.addEventListener('click', function() {
+
+                    // Get filter type and value from button
+                    const filterType = this.dataset.type;
+                    const filterValue = this.dataset.filter;
+
+                    // Remove active class from all buttons in same group
+                    document.querySelectorAll(`[data-type="${filterType}"]`)
+                        .forEach(btn => btn.classList.remove('active'));
+
+                    // Add active class to clicked button
+                    this.classList.add('active');
+
+                    // Update active filter
+                    if (filterType === 'type') {
+                        activeTypeFilter = filterValue;
+                    } else if (filterType === 'age') {
+                        activeAgeFilter = filterValue;
+                    }
+
+                    // Re-filter and display activities
+                    filterActivities();
+                });
+            });
+        }
+
+        // Load activities from API
         async function loadActivities() {
 
             try {
-                // Call our Azure Function API
-                // fetch is a built in browser function for making HTTP requests
                 const response = await fetch(API_URL);
+                allActivities = await response.json();
 
-                // Convert the response to a JavaScript array
-                const activities = await response.json();
-
-                // Get the container div where we will put the cards
-                const container = document.getElementById('activities-container');
-
-                // Remove the loading message
+                // Remove loading message
                 document.getElementById('loading').remove();
 
-                // Check if we got any activities back
-                if (activities.length === 0) {
-                    container.innerHTML = '<p>No activities found.</p>';
-                    return;
-                }
+                // Set up filter buttons
+                setupFilters();
 
-                // Loop through each activity and build a card
-                // join combines all cards into one HTML string
-                container.innerHTML = activities
-                    .map(activity => buildActivityCard(activity))
-                    .join('');
+                // Display all activities initially
+                filterActivities();
 
             } catch (error) {
-                // If something goes wrong show an error message
                 document.getElementById('loading').textContent = 
                     'Error loading activities. Please try again later.';
                 console.error('Error:', error);
             }
         }
 
-        // Call loadActivities when the page loads
+        // Start loading when page loads
         loadActivities();
 
     </script>
