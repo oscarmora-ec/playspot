@@ -1,26 +1,49 @@
-<!-- This is a markdown file. It displays nicely on GitHub as formatted text -->
-<!-- The # symbol creates a large heading in markdown -->
-# PlaySpot
+# 🛝 PlaySpot
 
-<!-- Regular text with no symbol is just a normal paragraph -->
-A web app for parents to find kid-friendly activities.
+A cloud-native web application that helps parents find 
+kid-friendly activities filtered by type, age, and location.
 
-<!-- ## creates a smaller heading, like a section title -->
-## What it does
-Helps parents find playgrounds, indoor play spaces, and activities
-filtered by age, distance, and indoor/outdoor preference.
+## 🌐 Live Site
+[https://blue-field-0abae4e0f.7.azurestaticapps.net](https://blue-field-0abae4e0f.7.azurestaticapps.net)
 
-## Built by
-Oscar Mora - learning Azure cloud deployment through a real project.
+## 📱 Features
+- Browse kid-friendly activities near you
+- Filter by Indoor/Outdoor
+- Filter by age range (Toddler, Young, Older)
+- Real-time data from cloud database
+- Mobile friendly design
 
-<!-- This section tracks what technologies we are using -->
-## Tech Stack
-<!-- The dash - creates a bullet point in markdown -->
-- HTML, CSS (starting point)
-- Azure Static Web Apps (hosting)
+## 🏗️ Architecture
 
-## Status
-In progress - Day 1
+## ☁️ Azure Services Used
+- **Azure Static Web Apps** — hosts the frontend
+- **Azure Functions** — serverless REST API backend
+- **Azure Cosmos DB** — NoSQL database for activities
+- **Azure Blob Storage** — stores activity images
+- **Azure Key Vault** — secrets management
+- **Azure Monitor** — monitoring and alerts
+- **GitHub Actions** — CI/CD auto deployment
 
-## Live Site
-https://blue-field-0abae4e0f.7.azurestaticapps.net/
+## 🔧 Tech Stack
+- Frontend: HTML, CSS, JavaScript
+- Backend: Node.js Azure Functions
+- Database: Azure Cosmos DB (NoSQL)
+- Infrastructure: Microsoft Azure
+- CI/CD: GitHub Actions
+
+## 📂 Related Repositories
+- [PlaySpot Functions](https://github.com/oscarmora-ec/playspot-functions) 
+  — Azure Functions backend API
+- [Azure Cloud Labs](https://github.com/oscarmora-ec/azure-cloud-labs) 
+  — Learning notes and scripts
+
+## 👨‍💻 Built By
+Oscar Mora — Senior Application Engineer transitioning 
+to Cloud Engineering.
+
+- AZ-104 Azure Administrator Certified
+- AZ-900 Azure Fundamentals Certified
+- AWS Cloud Practitioner Certified
+
+## 📈 Status
+Active development — adding new features regularly.
