@@ -41,6 +41,20 @@
                 </button>
             </div>
 
+            <!-- State/Location filters -->
+            <div class="filter-group">
+                <span class="filter-label">Location:</span>
+                <button class="filter-btn active" data-filter="all" data-type="state">
+                    All
+                </button>
+                <button class="filter-btn" data-filter="MA" data-type="state">
+                    📍 Massachusetts
+                </button>
+                <button class="filter-btn" data-filter="NH" data-type="state">
+                    📍 New Hampshire
+                </button>
+            </div>
+
             <!-- Age filters -->
             <div class="filter-group">
                 <span class="filter-label">Age:</span>
@@ -78,6 +92,9 @@
         // Track currently active filters
         let activeTypeFilter = 'all';
         let activeAgeFilter = 'all';
+
+        // Track active state filter
+        let activeStateFilter = 'all';
 
         // Build HTML card for one activity
         function buildActivityCard(activity) {
@@ -137,6 +154,11 @@
                 });
             }
 
+                    // Apply state filter if not set to all
+                    if (activeStateFilter !== 'all') {
+                        filtered = filtered.filter(a => a.state === activeStateFilter);
+                    }
+
             // Get the container
             const container = document.getElementById('activities-container');
 
@@ -179,6 +201,8 @@
                         activeTypeFilter = filterValue;
                     } else if (filterType === 'age') {
                         activeAgeFilter = filterValue;
+                    } else if (filterType === 'state') {
+                        activeStateFilter = filterValue;
                     }
 
                     // Re-filter and display activities
